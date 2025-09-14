@@ -1,0 +1,44 @@
+add-plugins:
+  - selectors:
+      - $.services[?(@.name=='restful-api-demo')].routes[?(@.name=='restful-api-demo_listobjects')]
+    overwrite: false
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: "/objects"
+  - selectors:
+      - $.services[?(@.name=='restful-api-demo')].routes[?(@.name=='restful-api-demo_getobject')]
+    overwrite: false
+    plugins:
+      - name: request-transformer
+        config:
+          replace:
+            uri: "/objects/$(uri_captures['id'])"
+  - selectors:
+      - $.services[?(@.name=='restful-api-demo')].routes[?(@.name=='restful-api-demo_createobject')]
+    overwrite: false
+    plugins:
+      - name: pre-function
+        config:
+          access:
+            - |-
+              local body = kong.request.get_body()
+              if body then
+                local data1 = body.data.field1 or ""
+                local data2 = body.data.field2 or ""
+                local data = data1 .. "|" .. data2
+                local hash = ngx.md5(data)
+                kong.service.request.set_header("X-Body-Hash", hash)
+              end
+      - name: proxy-cache-advanced
+        config:
+          content_type:
+          - application/json
+          request_method:
+          - POST
+          strategy: memory
+          cache_ttl: 300
+          vary_headers:
+          - X-Body-Hash
+    

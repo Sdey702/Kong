@@ -1,0 +1,90 @@
+Kong
+
+
+First
+-----
+1. Install data Plane in my laptop using docker
+2. Now my local host is my proxy url **http://localhost:8000**
+3. I build dummy service and route [http://localhost:8000/list it's worked]
+
+
+Second
+------
+We install deck in my laptop usinf .deb file
+
+we create user token
+kpat_lUj5TQRFs4NwLfsbfFKoFxqHYLFzYDNViver5NTshi1AYBT3K
+
+Using below command we create .deck.yaml by default deck check $HOME directory
+any .deck.yaml file present or not 
+
+cat << EOF > ~/.deck.yaml
+konnect-addr: https://us.api.konghq.com
+konnect-token: kpat_lUj5TQRFs4NwLfsbfFKoFxqHYLFzYDNViver5NTshi1AYBT3K
+konnect-control-plane-name: Subhankar
+EOF
+
+
+Third 
+-----
+
+Using chatgpt we created one sample open api spec file from restful-api.dev
+services
+
+Using below command we can create opeapi spac file to kong file
+deck file openapi2kong -s sample-restful-api.yaml -o sample-kong.yaml
+
+Using syns commanf we can deploye the deck file inside kong
+deck gateway sync sample-kong.yaml
+
+Note : But other all services will deleted when we do that
+
+We have to add tag using below command
+deck file add-tags -s sample-kong.yaml -o tag-sample-kong.yaml sample-tag
+
+after that we can add below command for create gateway services
+deck gateway sync tag-sample-kong.yaml --select-tag sample-tag
+
+
+Fourth
+------
+
+Add plugin
+
+
+Now I have new plugin file service-ratelimit-plugin.yaml now I have to add this in our kong file
+[tag-sample-kong.yaml]
+
+
+deck file add-plugins -s tag-sample-kong.yaml -o plugin-sample-kong.yaml service-ratelimit-plugin.yaml
+
+
+
+Now we have new kong file with pluging plugin-sample-kong.yaml so we have to deploye this 
+
+deck gateway sync plugin-sample-kong.yaml --select-tag sample-tag
+
+
+
+Now Work On Guru Request : 
+
+1. We transfer the request using request-transformer plugin
+
+deck file add-plugins -s tag-sample-kong.yaml -o plugin-1-sample-kong.yaml request-transformer-sample-kong.yaml
+
+
+Now we have new kong file with pluging plugin-1-sample-kong.yaml so we have to deploye this 
+
+deck gateway sync plugin-1-sample-kong.yaml --select-tag sample-tag
+
+
+
+Note : 
+   In request-transformer-sample-kong.xaml file we add pre-function and proxy-cache-advanced
+plugin for specific rout for caching on reqquest body bydefault method present get so we converted to post
+
+then we create final kong file and sync to the kong konnect.
+
+
+
+

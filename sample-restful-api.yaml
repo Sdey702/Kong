@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: RESTful API Demo
+  description: A simple OpenAPI spec for restful-api.dev covering basic object operations.
+  version: 1.0.0
+servers:
+  - url: https://api.restful-api.dev
+paths:
+  /objects:
+    get:
+      summary: List all objects
+      operationId: listObjects
+      responses:
+        '200':
+          description: A list of objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Object'
+    post:
+      summary: Create a new object
+      operationId: createObject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewObject'
+      responses:
+        '201':
+          description: Object created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Object'
+  /objects/{id}:
+    get:
+      summary: Fetch one object
+      operationId: getObject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Object details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Object'
+        '404':
+          description: Object not found
+components:
+  schemas:
+    Object:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        name:
+          type: string
+          example: Apple MacBook Pro 16
+        data:
+          type: object
+          example:
+            year: 2019
+            price: 1849.99
+    NewObject:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: My Custom Object
+        data:
+          type: object
+          example:
+            field1: foo
+            field2: 123

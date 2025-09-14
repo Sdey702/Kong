@@ -1,0 +1,10 @@
+add-plugins:
+  - selectors:
+      - $.services[?(@.name=='restful-api-demo')]
+    overwrite: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 5
+          hour: 1000
+          policy: local

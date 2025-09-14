@@ -1,0 +1,76 @@
+_format_version: "3.0"
+services:
+- host: api.restful-api.dev
+  id: b411e988-736c-5303-b57e-3a9a372b9a73
+  name: restful-api-demo
+  path: /
+  plugins: []
+  port: 443
+  protocol: https
+  routes:
+  - id: 89e06de3-4f06-5b47-8f1c-de0461fd1b93
+    methods:
+    - GET
+    name: restful-api-demo_listobjects
+    paths:
+    - ~/product-by-id/rest
+    plugins:
+    - config:
+        replace:
+          uri: /objects
+      name: request-transformer
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - sample-tag
+  - id: 093bb8a4-9e90-50b4-bf98-c9a8820a66dd
+    methods:
+    - POST
+    name: restful-api-demo_createobject
+    paths:
+    - ~/objects$
+    plugins:
+    - config:
+        access:
+        - |-
+          local body = kong.request.get_body()
+          if body then
+            local data1 = body.data.field1 or ""
+            local data2 = body.data.field2 or ""
+            local data = data1 .. "|" .. data2
+            local hash = ngx.md5(data)
+            kong.service.request.set_header("X-Body-Hash", hash)
+          end
+      name: pre-function
+    - config:
+        cache_ttl: 300
+        content_type:
+        - application/json
+        request_method:
+        - POST
+        strategy: memory
+        vary_headers:
+        - X-Body-Hash
+      name: proxy-cache-advanced
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - sample-tag
+  - id: fcc1c3e9-e2fc-5dac-ace8-2a65acdab078
+    methods:
+    - GET
+    name: restful-api-demo_getobject
+    paths:
+    - ~/product-by-id/(?<id>[^#?/]+)$
+    plugins:
+    - config:
+        replace:
+          uri: /objects/$(uri_captures['id'])
+      name: request-transformer
+    regex_priority: 100
+    strip_path: false
+    tags:
+    - sample-tag
+  tags:
+  - sample-tag
+upstreams: []

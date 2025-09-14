@@ -1,0 +1,51 @@
+_format_version: "3.0"
+services:
+- host: api.restful-api.dev
+  id: b411e988-736c-5303-b57e-3a9a372b9a73
+  name: restful-api-demo
+  path: /
+  plugins:
+  - config:
+      hour: 1000
+      minute: 5
+      policy: local
+    name: rate-limiting
+  port: 443
+  protocol: https
+  routes:
+  - id: 89e06de3-4f06-5b47-8f1c-de0461fd1b93
+    methods:
+    - GET
+    name: restful-api-demo_listobjects
+    paths:
+    - ~/objects$
+    plugins: []
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - sample-tag
+  - id: 093bb8a4-9e90-50b4-bf98-c9a8820a66dd
+    methods:
+    - POST
+    name: restful-api-demo_createobject
+    paths:
+    - ~/objects$
+    plugins: []
+    regex_priority: 200
+    strip_path: false
+    tags:
+    - sample-tag
+  - id: fcc1c3e9-e2fc-5dac-ace8-2a65acdab078
+    methods:
+    - GET
+    name: restful-api-demo_getobject
+    paths:
+    - ~/objects/(?<id>[^#?/]+)$
+    plugins: []
+    regex_priority: 100
+    strip_path: false
+    tags:
+    - sample-tag
+  tags:
+  - sample-tag
+upstreams: []
